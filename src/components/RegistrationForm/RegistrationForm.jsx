@@ -1,96 +1,46 @@
-import React, { useState } from "react";
-import { Button, TextField, Switch, FormControlLabel } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import DeliveryData from './DeliveryData';
+import Finishing from './Finishing';
+import UserData from './UserData';
+import PersonalData from './PersonalData';
+import { Typography, Stepper, Step, StepLabel } from '@material-ui/core';
 
+function RegistrationForm({ whenSend, validation }) {
 
-function RegistrationForm({whenSend, validCPF}) {
+    const [currentStep, setCurrentStep] = useState(0);
+    const [dataCollected, setData] = useState({});
+    
+    useEffect(() => {
+        if (currentStep === forms.length - 1) {
+            whenSend(dataCollected)
+        }
+    })
 
-    const [name, setName] = useState("");
-    const [lastname, setLastname] = useState("");
-    const [cpf, setCpf] = useState("");
-    const [promotion, setPromotion] = useState(true);
-    const [news, setNews] = useState(true);
-    const [error, setError] = useState({cpf:{valid:true, text:""}});
+    const forms = [
+        <UserData whenSend={collectData} validation={validation}/>,
+        <PersonalData whenSend={collectData} validation={validation} />,
+        <DeliveryData whenSend={collectData} validation={validation}/>,
+        <Finishing />,
+    ];
 
-    return (
-        <form
-            onSubmit={(e) => {
-                whenSend({name, lastname, cpf, promotion, news})
-                e.preventDefault();
-            }}>
+    function collectData(data) {
+        setData({ ...dataCollected, ...data });
+        next();
+        console.log(dataCollected)
+    }
 
-            <TextField
-                value={name}
-                onChange={(e) => {
-                    setName(e.target.value)
-                }}
-                id="name"
-                label="Name"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-            />
+    function next() {
+        setCurrentStep(currentStep + 1);
+    }
 
-            <TextField
-                value={lastname}
-                onChange={(e) =>
-                    setLastname(e.target.value)}
-                id="lastname"
-                label="Last name"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-            />
-
-            <TextField
-                value={cpf}
-                onChange={(e) => {
-                    setCpf(e.target.value)
-                }}
-
-                onBlur={(e) => {
-                    const isValid = validCPF(cpf);
-                    setError({cpf:isValid})
-                }}
-
-                error={!error.cpf.valid}
-                helperText={error.cpf.text}
-                id="cpf"
-                label="CPF"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-            />
-
-            <FormControlLabel
-                label="Promotion"
-                control={<Switch
-                    checked={promotion}
-                    onChange={(e) => {
-                        setPromotion(e.target.checked)
-                    }}
-                    name="promotion"
-                    color="primary" />}
-            />
-
-            <FormControlLabel
-                label="News"
-                control={<Switch
-                    checked={news}
-                    onChange={(e) => {
-                        setNews(e.target.checked)
-                    }}
-                    name="news"
-                    color="primary" />}
-            />
-
-            <Button
-                type="submit"
-                variant="contained"
-                color="primary">
-                Register
-            </Button>
-        </form>
-    )
+    return <>
+        <Stepper activeStep={currentStep}>
+            <Step><StepLabel>Login</StepLabel></Step>
+            <Step><StepLabel>Person</StepLabel></Step>
+            <Step><StepLabel>Delivery</StepLabel></Step>
+            <Step><StepLabel>Finish</StepLabel></Step>
+        </Stepper>
+        {forms[currentStep]}
+    </>
 }
-
 export default RegistrationForm

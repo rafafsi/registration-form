@@ -4,33 +4,30 @@ import './App.css';
 import 'fontsource-roboto'
 import { Container, Typography } from '@material-ui/core'
 
+
 import RegistrationForm from './components/RegistrationForm/RegistrationForm';
 
+import { toValidCPF, toValidName, toValidPassword } from '../src/models/Registration'
+import FormValidation from './contexts/FormValidation';
 class App extends Component {
   render() {
     return (
       <Container component="article" maxWidth="sm">
-        <Typography 
+        <Typography
           variant="h3"
           align="center"
           component="h1">Registration Form
         </Typography>
-        <RegistrationForm whenSend={whenSendingForm} validCPF={toValidCPF}/>
+        <FormValidation.Provider value={{ cpf: toValidCPF, password: toValidPassword, name: toValidName }}>
+           <RegistrationForm whenSend={whenSending} />
+        </FormValidation.Provider>
       </Container>
     );
   }
 }
 
-function whenSendingForm(data) {
+function whenSending(data) {
   console.log(data)
-}
-
-function toValidCPF(cpf){
-  if(cpf.length !== 11){
-    return {valid:false, text:"CPF must have 11 digits"}
-  } else {
-    return {valid:true, text:""}
-  }
 }
 
 export default App;
